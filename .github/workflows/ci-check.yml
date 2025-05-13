@@ -53,23 +53,18 @@ jobs:
           echo "📂 File list in target:"
           ls -R target || echo "target directory not found"
 
-
       - name: 📝 Report Checkstyle result in PR
         if: always()
         run: |
-          if [ -f target/checkstyle-result.xml ]; then
-            FILE=target/checkstyle-result.xml
-          elif [ -f target/site/checkstyle.xml ]; then
-            FILE=target/site/checkstyle.xml
-          else
-            echo "⚠️ Checkstyle 결과 파일 없음"
-            exit 0
-          fi
+          FILE=target/checkstyle-result.xml
+
+          echo "📄 Using file: $FILE"
+          head -n 10 $FILE
 
           cat $FILE | reviewdog \
             -f=checkstyle \
             -name="checkstyle" \
             -reporter=github-pr-check \
-            -level=info
+            -fail-level=info   # ✅ 위반이 없어도 항상 PR UI에 표출됨
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
