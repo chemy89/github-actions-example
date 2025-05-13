@@ -23,46 +23,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 📦 Cache Maven packages
-        uses: actions/cache@v3
+      - name: Build project
+        run: mvn clean package -DskipTests
+
+      - name: Run SpotBugs with FindSecBugs
+        uses: advanced-security/spotbugs-findsecbugs-action@v1.0.6
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven
-
-      - name: 🐶 Install reviewdog
-        run: curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
-
-      - name: 🛡️ Run FindSecBugs
-        run: |
-          mvn compile spotbugs:spotbugs || true
-      
-      - name: 🧪 SpotBugs 결과 파일 확인
-        run: |
-          find target -name "*spotbugs*.xml"
-          ls -R target
-
-      - name: 📝 Report FindSecBugs result in PR
-        if: always()
-        run: |
-          FILE=target/spotbugsXml.xml
-
-          if [ ! -f "$FILE" ]; then
-            echo "❌ SpotBugs 결과 XML 파일이 없습니다: $FILE"
-            exit 0
-          fi
-
-          echo "📄 Using file: $FILE"
-          head -n 10 "$FILE"
-
-          sed -i "s|$(pwd)/||g" "$FILE"
-
-          cat "$FILE" | reviewdog \
-            -f=spotbugs \
-            -name="findsecbugs" \
-            -reporter=github-pr-check \
-            -fail-level=info \
-            -filter-mode=nofilter
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          spotbugs_version: '4.7.3'
+          findsecbugs_version: '1.12.0'
+          spotbugs_target: 'target'
+          spotbugs_filename_glob: '*.jar'
+          upload_sarif: true
