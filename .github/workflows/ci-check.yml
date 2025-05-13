@@ -38,6 +38,22 @@ jobs:
       - name: 🔧 Run Checkstyle
         run: mvn checkstyle:checkstyle || true
 
+      - name: 🧪 Check generated Checkstyle files
+        if: always()
+        run: |
+          echo "▶ target/checkstyle-result.xml:"
+          test -f target/checkstyle-result.xml && echo "✅ Found" || echo "❌ Not Found"
+
+          echo "▶ target/site/checkstyle.xml:"
+          test -f target/site/checkstyle.xml && echo "✅ Found" || echo "❌ Not Found"
+
+          echo "▶ target/site/checkstyle.html:"
+          test -f target/site/checkstyle.html && echo "✅ Found" || echo "❌ Not Found"
+
+          echo "📂 File list in target:"
+          ls -R target || echo "target directory not found"
+
+
       - name: 📝 Report Checkstyle result in PR
         if: always()
         run: |
