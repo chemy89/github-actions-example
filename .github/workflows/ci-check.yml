@@ -22,14 +22,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-
       - name: Install reviewdog
         run: |
           curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
       - name: Run Checkstyle only (no compile)
         run: |
-          mvn checkstyle:checkstyle -Dcheckstyle.output.format=xml || true
+          mvn checkstyle:checkstyle || true
 
       - name: Report result
         run: |
