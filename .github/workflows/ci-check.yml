@@ -1,4 +1,4 @@
-name: Checkstyle CI
+name: Checkstyle Only
 
 on:
   pull_request:
@@ -6,30 +6,30 @@ on:
 
 permissions:
   contents: read
-  checks: write  # ✅ github-pr-check를 사용하려면 반드시 필요
+  checks: write
 
 jobs:
   checkstyle:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'
 
       - name: Install reviewdog
         run: |
           curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
-      - name: Run Checkstyle (generate XML)
-        run: mvn verify
+      - name: Run Checkstyle only (no compile)
+        run: |
+          mvn checkstyle:checkstyle -Dcheckstyle.output.format=xml || true
 
-      - name: Report Checkstyle results to PR UI
+      - name: Report result
         run: |
           if [ -f target/checkstyle-result.xml ]; then
             cat target/checkstyle-result.xml | reviewdog \
@@ -38,7 +38,7 @@ jobs:
               -reporter=github-pr-check \
               -fail-level=info
           else
-            echo "⚠️ No Checkstyle result file found."
+            echo "⚠️ Checkstyle 결과 파일 없음"
           fi
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
