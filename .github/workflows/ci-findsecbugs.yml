@@ -7,6 +7,10 @@ on:
 permissions:
   contents: read
   checks: write
+  security-events: write
+
+env:
+  _JAVA_OPTIONS: "-Xmx2G -Xms512m"
 
 jobs:
   findsecbugs:
