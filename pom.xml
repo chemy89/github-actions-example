@@ -22,28 +22,19 @@
     <plugins>
 
       <!-- ✅ Checkstyle -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.3.0</version>
-        <configuration>
-          <configLocation>checkstyle.xml</configLocation> <!-- 기본 규칙 또는 사용자 정의 -->
-          <outputFile>target/checkstyle-result.xml</outputFile> <!-- 반드시 명시 -->
-          <outputFormat>xml</outputFormat> <!-- ✅ reviewdog 연동 필수 -->
-          <consoleOutput>true</consoleOutput>
-          <failsOnError>false</failsOnError> <!-- 위반 있어도 빌드 실패 X -->
-          <linkXRef>false</linkXRef>
-          <checkstyleVersion>${checkstyle.version}</checkstyleVersion>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>verify</phase>
-            <goals>
-              <goal>checkstyle</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+         <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-checkstyle-plugin</artifactId>
+           <version>3.3.0</version>
+           <configuration>
+             <configLocation>checkstyle.xml</configLocation> <!-- checkstyle.xml 위치 -->
+             <outputFile>${project.build.directory}/checkstyle-result.xml</outputFile> <!-- 반드시 명시 -->
+             <outputFormat>xml</outputFormat> <!-- reviewdog용 -->
+             <failsOnError>false</failsOnError> <!-- 위반 있어도 빌드 실패 방지 -->
+             <consoleOutput>true</consoleOutput>
+           </configuration>
+         </plugin>
+
 
       <!-- ✅ SpotBugs + FindSecBugs -->
       <plugin>
