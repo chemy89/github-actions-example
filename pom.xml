@@ -12,32 +12,32 @@
   <name>GitHub Actions Example</name>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- ⚠ 경고 해결 -->
-    <checkstyle.version>10.12.3</checkstyle.version> <!-- ✅ 최신 Checkstyle 버전 명시 -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <checkstyle.version>10.12.3</checkstyle.version> <!-- 최신 버전 -->
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
   </properties>
 
   <build>
     <plugins>
-      
-      <!-- ✅ Checkstyle 플러그인 -->
+
+      <!-- ✅ Checkstyle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.3.0</version> <!-- 최신 버전 -->
+        <version>3.3.0</version>
         <configuration>
-          <configLocation>checkstyle.xml</configLocation>
-          <encoding>${project.build.sourceEncoding}</encoding>
-          <failsOnError>true</failsOnError>
+          <configLocation>checkstyle.xml</configLocation> <!-- 기본 규칙 또는 사용자 정의 -->
+          <outputFile>target/checkstyle-result.xml</outputFile> <!-- 반드시 명시 -->
+          <outputFormat>xml</outputFormat> <!-- ✅ reviewdog 연동 필수 -->
           <consoleOutput>true</consoleOutput>
-          <linkXRef>false</linkXRef> <!-- ⚠ XRef 경고 비활성화 -->
+          <failsOnError>false</failsOnError> <!-- 위반 있어도 빌드 실패 X -->
+          <linkXRef>false</linkXRef>
           <checkstyleVersion>${checkstyle.version}</checkstyleVersion>
         </configuration>
         <executions>
           <execution>
-            <id>validate</id>
-            <phase>validate</phase>
+            <phase>verify</phase>
             <goals>
               <goal>checkstyle</goal>
             </goals>
@@ -50,14 +50,6 @@
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
         <version>4.7.3.0</version>
-        <executions>
-          <execution>
-            <phase>verify</phase>
-            <goals>
-              <goal>spotbugs</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <effort>Max</effort>
           <threshold>Low</threshold>
@@ -72,19 +64,11 @@
             </plugin>
           </plugins>
         </configuration>
-      </plugin>
-
-      <!-- 🔍 선택: JXR (XRef 생성 용도) -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>3.3.0</version>
         <executions>
           <execution>
-            <id>generate-xref</id>
-            <phase>generate-sources</phase>
+            <phase>verify</phase>
             <goals>
-              <goal>jxr</goal>
+              <goal>spotbugs</goal>
             </goals>
           </execution>
         </executions>
