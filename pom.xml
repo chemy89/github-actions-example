@@ -23,17 +23,15 @@
 
       <!-- ✅ Checkstyle -->
 <plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-checkstyle-plugin</artifactId>
-  <version>3.3.0</version>
-  <configuration>
-    <configLocation>checkstyle.xml</configLocation> <!-- checkstyle.xml 위치 -->
-    <outputFile>${project.build.directory}/checkstyle-result.xml</outputFile> <!-- 반드시 명시 -->
-    <outputFormat>xml</outputFormat> <!-- reviewdog용 -->
-    <failsOnError>false</failsOnError> <!-- 위반 있어도 빌드 실패 방지 -->
-    <consoleOutput>true</consoleOutput>
-  </configuration>
-</plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-checkstyle-plugin</artifactId>
+      <version>3.1.2</version>
+      <configuration>
+        <configLocation>checkstyle.xml</configLocation>
+        <encoding>UTF-8</encoding>
+        <failsOnError>true</failsOnError>
+      </configuration>
+    </plugin>
 
 
 
