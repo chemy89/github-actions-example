@@ -1,4 +1,4 @@
-name: Checkstyle Only
+name: Checkstyle
 
 on:
   pull_request:
@@ -36,22 +36,11 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
       - name: 🔧 Run Checkstyle
-        run: mvn checkstyle:checkstyle || true
-
-      - name: 🧪 Check generated Checkstyle files
-        if: always()
         run: |
-          echo "▶ target/checkstyle-result.xml:"
-          test -f target/checkstyle-result.xml && echo "✅ Found" || echo "❌ Not Found"
-
-          echo "▶ target/site/checkstyle.xml:"
-          test -f target/site/checkstyle.xml && echo "✅ Found" || echo "❌ Not Found"
-
-          echo "▶ target/site/checkstyle.html:"
-          test -f target/site/checkstyle.html && echo "✅ Found" || echo "❌ Not Found"
-
-          echo "📂 File list in target:"
-          ls -R target || echo "target directory not found"
+          mvn checkstyle:checkstyle \
+            -Dcheckstyle.config.location=checkstyle.xml \
+            -Dcheckstyle.output.format=xml \
+            -Dcheckstyle.output.file=target/checkstyle-result.xml || true
 
       - name: 📝 Report Checkstyle result in PR
         if: always()
@@ -65,6 +54,6 @@ jobs:
             -f=checkstyle \
             -name="checkstyle" \
             -reporter=github-pr-check \
-            -fail-level=info   # ✅ 위반이 없어도 항상 PR UI에 표출됨
+            -fail-level=info
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
