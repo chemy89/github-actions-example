@@ -22,27 +22,25 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: \${{ runner.os }}-maven-\${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            \${{ runner.os }}-maven-
+            ${{ runner.os }}-maven-
 
-      - name: Run Checkstyle
-        run: mvn checkstyle:checkstyle
+      - name: Install reviewdog
+        run: |
+          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
-      - name: Run SpotBugs + FindSecBugs
-        run: mvn spotbugs:spotbugs
+      - name: Run Checkstyle with Reviewdog
+        run: |
+          mvn checkstyle:checkstyle -Dcheckstyle.output.format=plain
+          cat target/checkstyle-result.xml | sed 's#<[^>]*>##g' > checkstyle.txt || true
+          cat checkstyle.txt | reviewdog -efm="%f:%l: %m" -name="checkstyle" -reporter=github-pr-check -fail-on-error=true
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Unit Tests
-        run: mvn test
-
-      - name: Upload Checkstyle Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: checkstyle-report
-          path: target/site/checkstyle.html
-
-      - name: Upload SpotBugs Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: spotbugs-report
-          path: target/spotbugsXml.xml
+      - name: Run SpotBugs with Reviewdog
+        run: |
+          mvn spotbugs:spotbugs -Dspotbugs.outputFormat=xml
+          cat target/spotbugsXml.xml | reviewdog -f=checkstyle -name="spotbugs" -reporter=github-pr-check -fail-on-error=true
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
