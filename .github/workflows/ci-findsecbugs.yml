@@ -1,0 +1,64 @@
+name: FindSecBugs
+
+on:
+  pull_request:
+    branches: [ develop, main ]
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  findsecbugs:
+    name: Run FindSecBugs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout source code
+        uses: actions/checkout@v4
+
+      - name: ☕ Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 📦 Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven
+
+      - name: 🐶 Install reviewdog
+        run: curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: 🛡️ Run FindSecBugs (via SpotBugs)
+        run: |
+          mvn spotbugs:spotbugs || true
+        # 결과 파일: target/spotbugsXml.xml
+
+      - name: 📝 Report FindSecBugs result in PR
+        if: always()
+        run: |
+          FILE=target/spotbugsXml.xml
+
+          if [ ! -f "$FILE" ]; then
+            echo "❌ SpotBugs 결과 XML 파일이 없습니다: $FILE"
+            exit 0
+          fi
+
+          echo "📄 Using file: $FILE"
+          head -n 10 "$FILE"
+
+          sed -i "s|$(pwd)/||g" "$FILE"
+
+          cat "$FILE" | reviewdog \
+            -f=spotbugs \
+            -name="findsecbugs" \
+            -reporter=github-pr-check \
+            -fail-level=info \
+            -filter-mode=nofilter
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
