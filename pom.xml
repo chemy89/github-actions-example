@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.example</groupId>
@@ -11,20 +11,41 @@
 
   <name>GitHub Actions Example</name>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- ⚠ 경고 해결 -->
+    <checkstyle.version>10.12.3</checkstyle.version> <!-- ✅ 최신 Checkstyle 버전 명시 -->
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+  </properties>
+
   <build>
     <plugins>
-      <!-- Checkstyle -->
+      
+      <!-- ✅ Checkstyle 플러그인 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>3.3.0</version> <!-- 최신 버전 -->
         <configuration>
           <configLocation>checkstyle.xml</configLocation>
+          <encoding>${project.build.sourceEncoding}</encoding>
           <failsOnError>true</failsOnError>
+          <consoleOutput>true</consoleOutput>
+          <linkXRef>false</linkXRef> <!-- ⚠ XRef 경고 비활성화 -->
+          <checkstyleVersion>${checkstyle.version}</checkstyleVersion>
         </configuration>
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>checkstyle</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
-      <!-- SpotBugs + FindSecBugs -->
+      <!-- ✅ SpotBugs + FindSecBugs -->
       <plugin>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
@@ -40,6 +61,9 @@
         <configuration>
           <effort>Max</effort>
           <threshold>Low</threshold>
+          <outputFormat>xml</outputFormat>
+          <outputDirectory>${project.build.directory}</outputDirectory>
+          <outputFile>spotbugsXml.xml</outputFile>
           <plugins>
             <plugin>
               <groupId>com.h3xstream.findsecbugs</groupId>
@@ -49,7 +73,23 @@
           </plugins>
         </configuration>
       </plugin>
+
+      <!-- 🔍 선택: JXR (XRef 생성 용도) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <id>generate-xref</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jxr</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
-
 </project>
