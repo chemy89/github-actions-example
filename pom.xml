@@ -1,95 +1,55 @@
-<build>
-    <finalName>security-example</finalName>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
+  <groupId>com.example</groupId>
+  <artifactId>github-actions-example</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>GitHub Actions Example</name>
+
+  <build>
     <plugins>
-        <!-- Spring Boot Plugin -->
-        <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-            <configuration>
-                <layout>WAR</layout>
-                <finalName>security-example</finalName>
-                <excludes>
-                    <exclude>
-                        <groupId>org.projectlombok</groupId>
-                        <artifactId>lombok</artifactId>
-                    </exclude>
-                </excludes>
-            </configuration>
-        </plugin>
+      <!-- Checkstyle -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.1.2</version>
+        <configuration>
+          <configLocation>checkstyle.xml</configLocation>
+          <failsOnError>true</failsOnError>
+        </configuration>
+      </plugin>
 
-        <!-- Kotlin Plugin -->
-        <plugin>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-maven-plugin</artifactId>
-            <version>${kotlin.version}</version>
-            <executions>
-                <execution>
-                    <id>compile</id>
-                    <phase>compile</phase>
-                    <goals>
-                        <goal>compile</goal>
-                    </goals>
-                </execution>
-                <execution>
-                    <id>test-compile</id>
-                    <phase>test-compile</phase>
-                    <goals>
-                        <goal>test-compile</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <jvmTarget>1.8</jvmTarget>
-            </configuration>
-        </plugin>
-
-        <!-- Maven Compiler Plugin -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <source>1.8</source>
-                <target>1.8</target>
-            </configuration>
-        </plugin>
-
-        <!-- ✅ Checkstyle: Java 코드 스타일 검사 플러그인 -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>3.1.2</version>
-            <configuration>
-                <configLocation>checkstyle.xml</configLocation> <!-- 검사 기준 파일 경로 -->
-                <encoding>UTF-8</encoding>
-                <failsOnError>true</failsOnError> <!-- 위반 시 빌드 실패 처리 -->
-            </configuration>
-        </plugin>
-
-        <!-- ✅ SpotBugs + FindSecBugs: 정적 분석 및 보안 검사 플러그인 -->
-        <plugin>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-maven-plugin</artifactId>
-            <version>4.7.3.0</version>
-            <executions>
-                <execution>
-                    <phase>verify</phase> <!-- Maven verify 단계에서 실행 -->
-                    <goals>
-                        <goal>spotbugs</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <effort>Max</effort> <!-- 검사 정밀도: 최대 -->
-                <threshold>Low</threshold> <!-- 민감도: 낮게 설정하면 더 많은 이슈 탐지 -->
-                <plugins>
-                    <plugin>
-                        <groupId>com.h3xstream.findsecbugs</groupId>
-                        <artifactId>findsecbugs-plugin</artifactId>
-                        <version>1.12.0</version> <!-- 보안 취약점 플러그인 -->
-                    </plugin>
-                </plugins>
-            </configuration>
-        </plugin>
+      <!-- SpotBugs + FindSecBugs -->
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>4.7.3.0</version>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>spotbugs</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <effort>Max</effort>
+          <threshold>Low</threshold>
+          <plugins>
+            <plugin>
+              <groupId>com.h3xstream.findsecbugs</groupId>
+              <artifactId>findsecbugs-plugin</artifactId>
+              <version>1.12.0</version>
+            </plugin>
+          </plugins>
+        </configuration>
+      </plugin>
     </plugins>
-</build>
+  </build>
+
+</project>
