@@ -91,6 +91,5 @@
                 </plugins>
             </configuration>
         </plugin>
-
     </plugins>
 </build>
