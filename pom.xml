@@ -22,18 +22,19 @@
     <plugins>
 
       <!-- ✅ Checkstyle -->
-<plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-checkstyle-plugin</artifactId>
-      <version>3.1.2</version>
-      <configuration>
-        <configLocation>checkstyle.xml</configLocation>
-        <encoding>UTF-8</encoding>
-        <failsOnError>true</failsOnError>
-      </configuration>
-    </plugin>
-
-
+        <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>3.1.2</version>
+            <configuration>
+                <configLocation>checkstyle.xml</configLocation>
+                <encoding>UTF-8</encoding>
+                <outputFile>${project.build.directory}/checkstyle-result.xml</outputFile> <!-- ✅ 반드시 필요 -->
+                <outputFormat>xml</outputFormat>                                           <!-- ✅ 반드시 필요 -->
+                <failsOnError>false</failsOnError>                                         <!-- ✅ 리뷰용이므로 실패 X -->
+                <consoleOutput>true</consoleOutput>
+            </configuration>
+        </plugin>
 
       <!-- ✅ SpotBugs + FindSecBugs -->
       <plugin>
