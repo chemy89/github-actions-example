@@ -34,13 +34,13 @@ jobs:
         run: |
           mvn checkstyle:checkstyle -Dcheckstyle.output.format=plain
           cat target/checkstyle-result.xml | sed 's#<[^>]*>##g' > checkstyle.txt || true
-          cat checkstyle.txt | reviewdog -efm="%f:%l: %m" -name="checkstyle" -reporter=github-pr-check -fail-on-error=true
+          cat checkstyle.txt | reviewdog -efm="%f:%l: %m" -name="checkstyle" -reporter=github-pr-review -fail-on-error=true
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run SpotBugs with Reviewdog
         run: |
           mvn spotbugs:spotbugs -Dspotbugs.outputFormat=xml
-          cat target/spotbugsXml.xml | reviewdog -f=checkstyle -name="spotbugs" -reporter=github-pr-check -fail-on-error=true
+          cat target/spotbugsXml.xml | reviewdog -f=checkstyle -name="spotbugs" -reporter=github-pr-review -fail-on-error=true
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
