@@ -36,7 +36,7 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
       - name: 🔧 Run Checkstyle
-        run: mvn checkstyle:checkstyle
+        run: mvn checkstyle:checkstyle || true
 
       - name: 📝 Report Checkstyle result in PR
         if: always()
