@@ -38,4 +38,3 @@ jobs:
           spotbugs_target: 'target/classes'
           spotbugs_filename_glob: '**.class'
           upload_sarif: true
-        
