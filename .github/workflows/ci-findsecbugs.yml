@@ -34,9 +34,9 @@ jobs:
       - name: 🐶 Install reviewdog
         run: curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
-      - name: 🛡️ Run FindSecBugs (via SpotBugs)
+      - name: 🛡️ Run FindSecBugs
         run: |
-          mvn spotbugs:spotbugs || true
+          mvn compile spotbugs:spotbugs || true
       
       - name: 🧪 SpotBugs 결과 파일 확인
         run: |
