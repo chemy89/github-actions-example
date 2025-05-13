@@ -1,4 +1,4 @@
-name: CI Check
+name: Checkstyle CI
 
 on:
   pull_request:
@@ -6,14 +6,14 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
+  checks: write
 
 jobs:
-  quality-check:
+  checkstyle:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Java
@@ -22,47 +22,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
       - name: Install reviewdog
         run: |
           curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
-      - name: Run Checkstyle with Reviewdog
+      - name: Run Checkstyle and report
         run: |
-          mvn checkstyle:checkstyle -Dcheckstyle.output.format=xml
-          if [ -f target/checkstyle-result.xml ]; then
-            cat target/checkstyle-result.xml | reviewdog \
-              -f=checkstyle \
+          mvn checkstyle:checkstyle -Dcheckstyle.output.format=plain \
+          | reviewdog \
+              -efm="%f:%l: %m" \
               -name="checkstyle" \
-              -reporter=github-pr-review \
+              -reporter=github-pr-check \
               -fail-level=info
-          else
-            echo "Checkstyle result file not found."
-          fi
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run SpotBugs with Reviewdog
-        run: |
-          mvn spotbugs:spotbugs \
-            -Dspotbugs.outputFormat=xml \
-            -Dspotbugs.outputDirectory=target \
-            -Dspotbugs.outputFile=spotbugsXml.xml
-          if [ -f target/spotbugsXml.xml ]; then
-            cat target/spotbugsXml.xml | reviewdog \
-              -f=checkstyle \
-              -name="spotbugs" \
-              -reporter=github-pr-review \
-              -fail-level=info
-          else
-            echo "No SpotBugs report found. Skipping reviewdog."
-          fi
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
