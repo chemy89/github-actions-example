@@ -36,7 +36,11 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
 
       - name: 🔧 Run Checkstyle
-        run: mvn checkstyle:checkstyle || true
+        run: |
+          mvn checkstyle:checkstyle \
+            -Dcheckstyle.config.location=checkstyle.xml \
+            -Dcheckstyle.output.format=xml \
+            -Dcheckstyle.output.file=target/checkstyle-result.xml || true
 
       - name: 📝 Report Checkstyle result in PR
         if: always()
