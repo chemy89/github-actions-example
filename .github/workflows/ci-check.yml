@@ -36,13 +36,13 @@ jobs:
         run: mvn test
 
       - name: Upload Checkstyle Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: checkstyle-report
           path: target/site/checkstyle.html
 
       - name: Upload SpotBugs Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: spotbugs-report
           path: target/spotbugsXml.xml
