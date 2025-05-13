@@ -34,3 +34,4 @@ jobs:
           spotbugs_target: 'target'
           spotbugs_filename_glob: '*.jar'
           upload_sarif: true
+        
