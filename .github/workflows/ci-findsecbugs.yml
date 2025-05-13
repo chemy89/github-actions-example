@@ -37,7 +37,11 @@ jobs:
       - name: 🛡️ Run FindSecBugs (via SpotBugs)
         run: |
           mvn spotbugs:spotbugs || true
-        # 결과 파일: target/spotbugsXml.xml
+      
+      - name: 🧪 SpotBugs 결과 파일 확인
+        run: |
+          find target -name "*spotbugs*.xml"
+          ls -R target
 
       - name: 📝 Report FindSecBugs result in PR
         if: always()
