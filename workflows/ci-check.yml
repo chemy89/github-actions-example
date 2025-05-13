@@ -1,0 +1,48 @@
+name: CI Check
+
+on:
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: \${{ runner.os }}-maven-\${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            \${{ runner.os }}-maven-
+
+      - name: Run Checkstyle
+        run: mvn checkstyle:checkstyle
+
+      - name: Run SpotBugs + FindSecBugs
+        run: mvn spotbugs:spotbugs
+
+      - name: Run Unit Tests
+        run: mvn test
+
+      - name: Upload Checkstyle Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: checkstyle-report
+          path: target/site/checkstyle.html
+
+      - name: Upload SpotBugs Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: spotbugs-report
+          path: target/spotbugsXml.xml
