@@ -32,7 +32,7 @@ public class LoginController {
 	}
 	
 	@RequestMapping("/login")
-	public String login(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public String Login(HttpServletRequest request, HttpServletResponse response, String S) throws IOException {
 	    // Obtain the user's credentials from the login form
 	    String username = request.getParameter("username");
 	    String password = request.getParameter("password");
