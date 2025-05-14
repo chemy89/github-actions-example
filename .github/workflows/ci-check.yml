@@ -1,21 +1,59 @@
-name: Checkstyle
+# ✅ GitHub Actions 워크플로 이름
+name: Checkstyle & FindSecBugs
 
+# ✅ 워크플로 실행 조건
 on:
-  pull_request:
-    branches: [ develop, main ]
+  pull_request:            # PR 생성 또는 업데이트 시 실행
+    branches: [ develop, main ]  # 대상 브랜치는 develop과 main
 
+# ✅ 각 Job들이 필요한 권한 설정
 permissions:
   contents: read
   checks: write
+  pull-requests: write
+  security-events: write  # FindSecBugs 결과를 SARIF로 업로드하기 위한 권한
 
+# ✅ 모든 Job에서 공통적으로 사용할 JVM 옵션 설정
+env:
+  _JAVA_OPTIONS: "-Xmx2G -Xms512m"  # JVM 최대/최소 힙 메모리 설정
+
+##############################
+# ✅ Checkstyle 검사 Job 정의
+##############################
 jobs:
   checkstyle:
-    name: Run Checkstyle
-    runs-on: ubuntu-latest
+    name: ✅ Run Checkstyle        # GitHub Actions UI에 표시될 이름
+    runs-on: ubuntu-latest        # 실행 환경: 최신 우분투 이미지
 
     steps:
       - name: ⬇️ Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  # 저장소 소스코드를 체크아웃 (clone)
+
+      - name: ☕ Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'  # Temurin(OpenJDK 기반) JDK 설치
+          java-version: '17'       # Java 17 사용
+
+      - name: 🔍 Run Checkstyle Action
+        uses: nikitasavinov/checkstyle-action@0.6.0  # Checkstyle 전용 GitHub Action
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # PR 코멘트를 위한 인증 토큰
+          checkstyle_config: checkstyle.xml          # 프로젝트 루트에 있는 Checkstyle 설정 파일
+          reporter: github-pr-review                 # PR 코멘트 형식으로 위반 사항을 출력
+          level: info                                # 출력 레벨 (info, warning, error)
+          workdir: .                                 # 체크 대상 디렉토리 (기본값은 루트)
+
+###################################
+# ✅ FindSecBugs + SpotBugs 검사 Job
+###################################
+  findsecbugs:
+    name: 🔐 Run FindSecBugs
+    runs-on: ubuntu-latest        # 실행 환경: 최신 우분투 이미지
+
+    steps:
+      - name: ⬇️ Checkout source code
+        uses: actions/checkout@v4  # 소스코드 체크아웃
 
       - name: ☕ Set up JDK 17
         uses: actions/setup-java@v4
@@ -23,37 +61,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 📦 Cache Maven packages
-        uses: actions/cache@v3
+      - name: ⚙️ Build project (skip tests)
+        run: mvn clean package -DskipTests  # 클래스 파일 생성만 수행 (테스트 생략)
+
+      - name: 🐛 SpotBugs + FindSecBugs
+        uses: advanced-security/spotbugs-findsecbugs-action@v1.0.6  # SARIF 출력 포함 Action
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven
-
-      - name: Install reviewdog
-        run: |
-          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
-
-      - name: 🔧 Run Checkstyle
-        run: |
-          mvn checkstyle:checkstyle \
-            -Dcheckstyle.config.location=checkstyle.xml \
-            -Dcheckstyle.output.format=xml \
-            -Dcheckstyle.output.file=target/checkstyle-result.xml || true
-
-      - name: 📝 Report Checkstyle result in PR
-        if: always()
-        run: |
-          FILE=target/checkstyle-result.xml
-
-          echo "📄 Using file: $FILE"
-          head -n 10 $FILE
-
-          cat $FILE | reviewdog \
-            -f=checkstyle \
-            -name="checkstyle" \
-            -reporter=github-pr-check \
-            -fail-level=info
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          spotbugs_version: '4.7.3'               # SpotBugs 버전
+          findsecbugs_version: '1.12.0'           # FindSecBugs 플러그인 버전
+          spotbugs_target: 'target/classes'       # 분석 대상 .class 파일 경로
+          spotbugs_filename_glob: '**.class'      # 분석 대상 클래스 파일 패턴
+          upload_sarif: true                      # GitHub Security 탭에 SARIF 결과 업로드
