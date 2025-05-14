@@ -23,37 +23,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 📦 Cache Maven packages
-        uses: actions/cache@v3
+      - name: ✅ Run Checkstyle for Java Action
+        uses: nikitasavinov/checkstyle-action@0.6.0
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven
-
-      - name: Install reviewdog
-        run: |
-          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
-
-      - name: 🔧 Run Checkstyle
-        run: |
-          mvn checkstyle:checkstyle \
-            -Dcheckstyle.config.location=checkstyle.xml \
-            -Dcheckstyle.output.format=xml \
-            -Dcheckstyle.output.file=target/checkstyle-result.xml || true
-
-      - name: 📝 Report Checkstyle result in PR
-        if: always()
-        run: |
-          FILE=target/checkstyle-result.xml
-
-          echo "📄 Using file: $FILE"
-          head -n 10 $FILE
-
-          cat $FILE | reviewdog \
-            -f=checkstyle \
-            -name="checkstyle" \
-            -reporter=github-pr-check \
-            -fail-level=info
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: checkstyle.xml      # 프로젝트 루트에 있는 config 사용
+          reporter: github-pr-check              # PR UI 상에 코멘트로 결과 출력
+          level: info
+          workdir: .                             # (옵션) 기본값은 현재 디렉토리
