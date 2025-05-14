@@ -28,7 +28,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: checkstyle.xml      # 프로젝트 루트에 있는 config 사용
-          reporter: github-pr-check              # PR UI 상에 코멘트로 결과 출력
+          reporter: github-pr-review              # PR UI 상에 코멘트로 결과 출력
           level: info
           workdir: .                             # (옵션) 기본값은 현재 디렉토리
-          
+
