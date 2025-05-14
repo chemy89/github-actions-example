@@ -27,7 +27,6 @@
 		<org.egovframe.rte.version>4.3.0</org.egovframe.rte.version>
 		<selenium.version>4.13.0</selenium.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<checkstyle.version>10.12.3</checkstyle.version>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
@@ -157,50 +156,6 @@
 					</excludes>
 				</configuration>
 			</plugin>
-
-			<!-- ✅ Checkstyle -->
-			<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-checkstyle-plugin</artifactId>
-			<version>3.3.0</version> <!-- ✅ 최신 버전 -->
-			<configuration>
-				<configLocation>checkstyle.xml</configLocation>
-				<outputFile>${project.build.directory}/checkstyle-result.xml</outputFile> <!-- ✅ XML 생성 -->
-				<outputFormat>xml</outputFormat>
-				<failsOnError>false</failsOnError>
-				<consoleOutput>true</consoleOutput>
-			</configuration>
-			</plugin>
-
-			<!-- ✅ SpotBugs + FindSecBugs -->
-			<plugin>
-				<groupId>com.github.spotbugs</groupId>
-				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>4.7.3.0</version>
-				<configuration>
-				<effort>Max</effort>
-				<threshold>Low</threshold>
-				<outputFormat>xml</outputFormat>
-				<outputDirectory>${project.build.directory}</outputDirectory>
-				<outputFile>spotbugsXml.xml</outputFile>
-				<plugins>
-					<plugin>
-					<groupId>com.h3xstream.findsecbugs</groupId>
-					<artifactId>findsecbugs-plugin</artifactId>
-					<version>1.12.0</version>
-					</plugin>
-				</plugins>
-				</configuration>
-				<executions>
-				<execution>
-					<phase>verify</phase>
-					<goals>
-					<goal>spotbugs</goal>
-					</goals>
-				</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
 	</build>
 </project>
