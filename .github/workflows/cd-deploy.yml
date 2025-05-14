@@ -1,56 +1,44 @@
-name: CD Deploy
+name: Deploy to Server
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main  # 배포는 main 브랜치에 push 되었을 때만 실행
 
 jobs:
   deploy:
+    name: Deploy WAR to Server and Restart Tomcat
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source code
+      - name: 📦 Checkout Source
         uses: actions/checkout@v3
 
-      - name: Set up Java
+      - name: ☕ Set up JDK 11
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'temurin'
 
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: \${{ runner.os }}-maven-\${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            \${{ runner.os }}-maven-
-
-      - name: Build with Maven
+      - name: 🔨 Build with Maven
         run: mvn clean package -DskipTests
 
-      - name: Build Docker image
-        run: docker build -t \${{ secrets.DOCKER_IMAGE_NAME }} .
-
-      - name: Push Docker image to DockerHub
+      - name: 📂 Upload WAR to Server
         run: |
-          echo "\${{ secrets.DOCKER_PASSWORD }}" | docker login -u "\${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker push \${{ secrets.DOCKER_IMAGE_NAME }}
-
-      - name: Deploy to AWS ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ecs-task.json
-          service: my-service
-          cluster: my-cluster
-          wait-for-service-stability: true
-
-      - name: Notify to Slack
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          payload: |
-            {
-              "text": "🚀 배포 완료: `\${{ github.repository }}` → `\${{ github.ref_name }}`"
-            }
+          scp target/*.war ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_DEPLOY_DIR }}/app.war
         env:
-          SLACK_WEBHOOK_URL: \${{ secrets.SLACK_WEBHOOK_URL }}
+          # secrets에 사전 등록 필요
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_DEPLOY_DIR: ${{ secrets.REMOTE_DEPLOY_DIR }}
+
+      - name: 🚀 Restart Tomcat
+        run: |
+          ssh ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+            # Tomcat 중지
+            systemctl stop tomcat
+            sleep 5
+            # 기존 war 삭제 및 교체는 서버에서 처리 가능
+            # Tomcat 시작
+            systemctl start tomcat
+          EOF
