@@ -58,7 +58,7 @@ public class LoginController {
 	}
 
 	@RequestMapping("/logout")
-	public String logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public String Logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null && auth.isAuthenticated()) {
 			new SecurityContextLogoutHandler().logout(request, response, auth);
@@ -67,7 +67,7 @@ public class LoginController {
 	}
 
 	@RequestMapping("/loginFailure")
-	public String loginFailure() {
+	public String LoginFailure() {
 		return "login Failure!";
 	}
 
