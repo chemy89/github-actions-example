@@ -31,3 +31,4 @@ jobs:
           reporter: github-pr-check              # PR UI 상에 코멘트로 결과 출력
           level: info
           workdir: .                             # (옵션) 기본값은 현재 디렉토리
+          
