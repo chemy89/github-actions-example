@@ -1,44 +1,54 @@
+# ✅ GitHub Actions Workflow 이름 설정
 name: Deploy to Server
 
+# ✅ main 브랜치에 push 이벤트가 발생했을 때만 워크플로우 실행
 on:
   push:
     branches:
-      - main  # 배포는 main 브랜치에 push 되었을 때만 실행
+      - main  # 배포는 main 브랜치에서만 수행
 
 jobs:
   deploy:
+    # ✅ Job 이름 및 실행 환경 지정
     name: Deploy WAR to Server and Restart Tomcat
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # GitHub에서 제공하는 Ubuntu 가상 환경에서 실행
 
     steps:
+      # ✅ Step 1: 현재 Repository의 소스코드를 Checkout (가져오기)
       - name: 📦 Checkout Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # GitHub 공식 액션 사용
 
+      # ✅ Step 2: JDK 11 설정 (Maven 빌드를 위한 Java 환경 세팅)
       - name: ☕ Set up JDK 11
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v3  # Java 환경 설정을 위한 공식 액션
         with:
-          java-version: '11'
-          distribution: 'temurin'
+          java-version: '11'         # 사용할 Java 버전
+          distribution: 'temurin'    # 배포판은 Temurin(OpenJDK 기반)
 
+      # ✅ Step 3: Maven 빌드 (테스트는 생략하고 패키징만 수행)
       - name: 🔨 Build with Maven
-        run: mvn clean package -DskipTests
+        run: mvn clean package -DskipTests  # 테스트 생략하고 .war 파일 생성
 
+      # ✅ Step 4: 생성된 WAR 파일을 원격 서버로 전송 (scp 사용)
       - name: 📂 Upload WAR to Server
         run: |
+          # `target` 폴더의 .war 파일을 app.war 로 이름 지정하여 서버로 전송
           scp target/*.war ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_DEPLOY_DIR }}/app.war
         env:
-          # secrets에 사전 등록 필요
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_DEPLOY_DIR: ${{ secrets.REMOTE_DEPLOY_DIR }}
+          # GitHub Secrets 에서 설정한 값들을 환경 변수로 주입
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}              # 원격 서버의 사용자 이름
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}              # 원격 서버의 IP 또는 도메인
+          REMOTE_DEPLOY_DIR: ${{ secrets.REMOTE_DEPLOY_DIR }}  # .war 파일이 배포될 디렉토리 경로
 
+      # ✅ Step 5: 원격 서버에 접속하여 Tomcat 서버를 재시작
       - name: 🚀 Restart Tomcat
         run: |
+          # SSH를 통해 서버에 접속 후 명령어 실행
           ssh ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
-            # Tomcat 중지
+            # Tomcat 서버 중지
             systemctl stop tomcat
-            sleep 5
-            # 기존 war 삭제 및 교체는 서버에서 처리 가능
-            # Tomcat 시작
-            systemctl start tomcat
+            sleep 5  # 잠시 대기 (완전히 종료되도록)
+
+            # Tomcat은 지정된 폴더(app.war)를 자동으로 재배포하므로 별도 조치 없이 시작만 하면 됨
+            systemctl start tomcat  # Tomcat 서버 시작
           EOF
