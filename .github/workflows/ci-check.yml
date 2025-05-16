@@ -1,5 +1,5 @@
 # ✅ GitHub Actions 워크플로 이름
-name: Checkstyle & FindSecBugs
+name: Static Code Analysis
 
 # ✅ 워크플로 실행 조건
 on:
