@@ -66,6 +66,9 @@ jobs:
       - name: ⚙️ Build project (skip tests)
         run: mvn clean package -DskipTests  # 클래스 파일 생성만 수행 (테스트 생략)
 
+      - name: 🔍 확인: .class 파일 경로 확인
+        run: find . -name "*.class"
+
       - name: 🐛 SpotBugs + FindSecBugs
         uses: advanced-security/spotbugs-findsecbugs-action@v1.0.6  # SARIF 출력 포함 Action
         with:
