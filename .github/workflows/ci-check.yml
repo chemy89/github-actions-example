@@ -76,7 +76,6 @@ jobs:
           upload_sarif: true                      # GitHub Security 탭에 SARIF 결과 업로드
 
       - name: 📤 Upload SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: spotbugs.sarif
-          
