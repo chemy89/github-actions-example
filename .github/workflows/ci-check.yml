@@ -41,7 +41,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}  # PR 코멘트를 위한 인증 토큰
           checkstyle_config: checkstyle.xml          # 프로젝트 루트에 있는 Checkstyle 설정 파일
           reporter: github-pr-review                 # PR 코멘트 형식으로 위반 사항을 출력
-          level: info                                # 출력 레벨 (info, warning, error)
+          level: error                                # 출력 레벨 (info, warning, error)
           workdir: .                                 # 체크 대상 디렉토리 (기본값은 루트)
 
 ###################################
@@ -72,4 +72,3 @@ jobs:
           spotbugs_target: 'target/classes'       # 분석 대상 .class 파일 경로
           spotbugs_filename_glob: '**.class'      # 분석 대상 클래스 파일 패턴
           upload_sarif: true                      # GitHub Security 탭에 SARIF 결과 업로드
-          
