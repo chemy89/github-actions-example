@@ -66,15 +66,12 @@ jobs:
       - name: ⚙️ Build project (skip tests)
         run: mvn clean package -DskipTests  # 클래스 파일 생성만 수행 (테스트 생략)
 
-      - name: 🔍 확인 .class 파일 경로 확인
-        run: find . -name "*.class"
-
       - name: 🐛 SpotBugs + FindSecBugs
         uses: advanced-security/spotbugs-findsecbugs-action@v1.0.6  # SARIF 출력 포함 Action
         with:
           spotbugs_version: '4.7.3'               # SpotBugs 버전
           findsecbugs_version: '1.12.0'           # FindSecBugs 플러그인 버전
-          spotbugs_target: '**/target/classes'       # 분석 대상 .class 파일 경로
+          spotbugs_target: 'target/classes'       # 분석 대상 .class 파일 경로
           spotbugs_filename_glob: '**/*.class'    # 분석 대상 클래스 파일 패턴
           upload_sarif: true                      # GitHub Security 탭에 SARIF 결과 업로드
 
