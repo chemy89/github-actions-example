@@ -74,4 +74,3 @@ jobs:
           spotbugs_target: 'target/classes'       # 분석 대상 .class 파일 경로
           spotbugs_filename_glob: '*.class'       # 분석 대상 클래스 파일 패턴
           upload_sarif: true                      # GitHub Security 탭에 SARIF 결과 업로드
-          release: ${{ github.head_ref || github.ref_name }}-${{ github.run_id }}  # 🧠 실행마다 고유 release 이름
