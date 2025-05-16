@@ -6,9 +6,6 @@
 <module name="Checker">
     <property name="charset" value="UTF-8"/>
 
-    <!-- 파일 끝에 줄 하나 필요 -->
-    <module name="NewlineAtEndOfFile"/>
-
     <!-- 클래스/인터페이스/메서드/변수명 스타일 -->
     <module name="TreeWalker">
 

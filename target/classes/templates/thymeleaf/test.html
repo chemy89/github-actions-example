@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <ul>
+        <li th:each="item : ${list}"
+            th:text="${item.value}"
+            th:style="${item.isBold} ? 'color:red; font-weight:bold' : ''">
+        </li>
+    </ul>
+</body>
+</html>
