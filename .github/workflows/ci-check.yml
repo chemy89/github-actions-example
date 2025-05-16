@@ -23,7 +23,7 @@ env:
 jobs:
   checkstyle:
     name: ✅ Run Checkstyle        # GitHub Actions UI에 표시될 이름
-    runs-on: ubuntu-latest        # 실행 환경: 최신 우분투 이미지
+    runs-on: ubuntu-latest         # 실행 환경: 최신 우분투 이미지
 
     steps:
       - name: ⬇️ Checkout source code
@@ -49,11 +49,11 @@ jobs:
 ###################################
   findsecbugs:
     name: 🔐 Run FindSecBugs
-    runs-on: ubuntu-latest        # 실행 환경: 최신 우분투 이미지
+    runs-on: ubuntu-latest          # 실행 환경: 최신 우분투 이미지
 
     steps:
       - name: ⬇️ Checkout source code
-        uses: actions/checkout@v4  # 소스코드 체크아웃
+        uses: actions/checkout@v4   # 소스코드 체크아웃
         with:
           fetch-depth: 0            # 모든 커밋 기록을 가져옴 (FindSecBugs 분석에 필요)
 
@@ -72,7 +72,7 @@ jobs:
           spotbugs_version: '4.7.3'               # SpotBugs 버전
           findsecbugs_version: '1.12.0'           # FindSecBugs 플러그인 버전
           spotbugs_target: 'target/classes'       # 분석 대상 .class 파일 경로
-          spotbugs_filename_glob: '**/*.class'    # 분석 대상 클래스 파일 패턴
+          spotbugs_filename_glob: '*.class'       # 분석 대상 클래스 파일 패턴
           upload_sarif: true                      # GitHub Security 탭에 SARIF 결과 업로드
 
       - name: 📤 Upload SARIF to GitHub
