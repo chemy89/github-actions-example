@@ -3,7 +3,7 @@ name: Checkstyle & FindSecBugs
 
 # ✅ 워크플로 실행 조건
 on:
-  pull_request:            # PR 생성 또는 업데이트 시 실행
+  pull_request:                  # PR 생성 또는 업데이트 시 실행
     branches: [ develop, main ]  # 대상 브랜치는 develop과 main
 
 # ✅ 각 Job들이 필요한 권한 설정
@@ -72,5 +72,10 @@ jobs:
           spotbugs_version: '4.7.3'               # SpotBugs 버전
           findsecbugs_version: '1.12.0'           # FindSecBugs 플러그인 버전
           spotbugs_target: 'target/classes'       # 분석 대상 .class 파일 경로
-          spotbugs_filename_glob: '**.class'      # 분석 대상 클래스 파일 패턴
+          spotbugs_filename_glob: '**/*.class'    # 분석 대상 클래스 파일 패턴
           upload_sarif: true                      # GitHub Security 탭에 SARIF 결과 업로드
+
+      - name: 📤 Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: spotbugs.sarif
